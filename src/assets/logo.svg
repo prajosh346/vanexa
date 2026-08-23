@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="48" viewBox="0 0 320 96">
+  <rect width="320" height="96" fill="#071033" rx="8"/>
+  <text x="24" y="62" font-family="Inter,Helvetica,Arial" font-weight="700" font-size="44" fill="#fff">VANEXA</text>
+  <path d="M260 28 L292 48 L260 68" stroke="#d4a017" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

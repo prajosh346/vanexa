@@ -2,9 +2,81 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>vanexa</title>
+    <title>VANEXA — Grow Digitally. Grow Beyond.</title>
+    <meta name="description" content="VANEXA — Digital growth agency offering SEO, websites, Google Business Profile, content and design. Based in Pune." />
+    <meta property="og:title" content="VANEXA — Grow Digitally. Grow Beyond." />
+    <meta property="og:description" content="VANEXA helps businesses build powerful digital experiences, improve online visibility, and turn digital presence into measurable growth." />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href="https://example.com/" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://example.com/#organization",
+            "name": "VANEXA",
+            "url": "https://example.com/",
+            "logo": "https://example.com/src/assets/logo.svg",
+            "sameAs": [
+              "https://instagram.com/placeholder",
+              "https://linkedin.com/placeholder",
+              "https://facebook.com/placeholder",
+              "https://youtube.com/placeholder"
+            ],
+            "description": "VANEXA helps businesses build powerful digital experiences, improve online visibility, and turn digital presence into measurable growth."
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://example.com/#website",
+            "url": "https://example.com/",
+            "name": "VANEXA",
+            "publisher": { "@id": "https://example.com/#organization" }
+          },
+          {
+            "@type": "LocalBusiness",
+            "@id": "https://example.com/#localbusiness",
+            "name": "VANEXA",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Pune",
+              "addressRegion": "Maharashtra",
+              "addressCountry": "IN"
+            },
+            "telephone": "+91 00000 00000",
+            "areaServed": "IN",
+            "description": "Digital growth agency offering SEO, website development, content and design services."
+          },
+          {
+            "@type": "Service",
+            "serviceType": "SEO",
+            "provider": { "@id": "https://example.com/#organization" }
+          },
+          {
+            "@type": "Service",
+            "serviceType": "Website Development",
+            "provider": { "@id": "https://example.com/#organization" }
+          },
+          {
+            "@type": "Service",
+            "serviceType": "Google Business Profile",
+            "provider": { "@id": "https://example.com/#organization" }
+          },
+          {
+            "@type": "Service",
+            "serviceType": "Content Writing",
+            "provider": { "@id": "https://example.com/#organization" }
+          },
+          {
+            "@type": "Service",
+            "serviceType": "Graphics Design",
+            "provider": { "@id": "https://example.com/#organization" }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
