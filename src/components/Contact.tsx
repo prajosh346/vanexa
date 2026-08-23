@@ -1,5 +1,5 @@
 import emailjs from '@emailjs/browser'
-import { type FormEvent, useState } from 'react'
+import { type ChangeEvent, useEffect, useState } from 'react'
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_4ko9egl'
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_p5gi66o'
@@ -18,18 +18,28 @@ export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
+  useEffect(() => {
+    if (!statusMessage) return
+
+    const timer = window.setTimeout(() => {
+      setStatusMessage(null)
+    }, 2000)
+
+    return () => window.clearTimeout(timer)
+  }, [statusMessage])
+
   const isFormValid =
     formData.name.trim() !== '' &&
     formData.phone.trim() !== '' &&
     formData.message.trim() !== ''
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = event.target
     setFormData((prev) => ({ ...prev, [name]: value }))
     if (statusMessage) setStatusMessage(null)
   }
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: ChangeEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     if (!isFormValid) return
@@ -150,7 +160,7 @@ export default function Contact() {
             <button
               type="submit"
               disabled={!isFormValid || isSubmitting}
-              className="rounded-md bg-gradient-to-r from-[#d4a017] to-[#f0c75a] px-6 py-3 font-semibold text-[#071033] shadow-[0_10px_24px_rgba(212,160,23,0.35)] disabled:cursor-not-allowed disabled:opacity-55"
+              className="rounded-md bg-linear-to-r from-[#d4a017] to-[#f0c75a] px-6 py-3 font-semibold text-[#071033] shadow-[0_10px_24px_rgba(212,160,23,0.35)] disabled:cursor-not-allowed disabled:opacity-55"
             >
               {isSubmitting ? 'Sending...' : 'Send Enquiry'}
             </button>
