@@ -16,6 +16,7 @@ const defaultForm = {
 export default function Contact() {
   const [formData, setFormData] = useState(defaultForm)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   const isFormValid =
     formData.name.trim() !== '' &&
@@ -25,6 +26,7 @@ export default function Contact() {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = event.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+    if (statusMessage) setStatusMessage(null)
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -33,6 +35,7 @@ export default function Contact() {
     if (!isFormValid) return
 
     setIsSubmitting(true)
+    setStatusMessage(null)
 
     const name = formData.name.trim()
     const businessName = formData.businessName.trim() || 'N/A'
@@ -54,10 +57,13 @@ export default function Contact() {
     try {
       await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams, EMAILJS_PUBLIC_KEY)
       setFormData(defaultForm)
-      alert('Your enquiry has been sent successfully.')
+      setStatusMessage({ type: 'success', text: 'Your enquiry has been sent successfully.' })
     } catch (error) {
       console.error('EmailJS send failed:', error)
-      alert('EmailJS rejected the request because the recipient email is not configured in the template. Please set the template recipient to vanexastudio@gmail.com in your EmailJS dashboard.')
+      setStatusMessage({
+        type: 'error',
+        text: 'EmailJS rejected the request because the recipient email is not configured in the template. Please set the template recipient to vanexastudio@gmail.com in your EmailJS dashboard.',
+      })
     } finally {
       setIsSubmitting(false)
     }
@@ -128,6 +134,18 @@ export default function Contact() {
             required
             className="h-32 w-full rounded-lg border border-[#dfe9ff] bg-[#f9fbff] p-3 text-[#071033] outline-none placeholder:text-[#6b7b9a] focus:border-[#0b63ff]"
           />
+          {statusMessage && (
+            <div
+              className={`rounded-xl border px-4 py-3 text-sm font-medium ${
+                statusMessage.type === 'success'
+                  ? 'border-[#cfe7d7] bg-[#edfdf3] text-[#1a6d43]'
+                  : 'border-[#f4d2d2] bg-[#fff2f2] text-[#9c2e2e]'
+              }`}
+            >
+              {statusMessage.text}
+            </div>
+          )}
+
           <div>
             <button
               type="submit"
