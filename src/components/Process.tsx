@@ -10,17 +10,17 @@ const items = [
 
 export default function Process(){
   return (
-    <section id="process" className="section">
+    <section id="process" className="section bg-white">
       <div className="container">
-        <h2 className="text-2xl font-semibold">How We Grow Your Business</h2>
+        <h2 className="text-2xl font-semibold text-[#071033]">How We Grow Your Business</h2>
         <div className="mt-8 space-y-4">
           {items.map((it,i)=> (
-            <motion.div key={it.id} initial={{opacity:0,x:-30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{delay:i*0.08}} className="p-4 border rounded-lg">
+            <motion.div key={it.id} initial={{opacity:0,x:-30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{delay:i*0.08}} className="rounded-xl border border-[#dfe9ff] bg-[#f9fbff] p-4 shadow-sm">
               <div className="flex items-start gap-4">
-                <div className="font-bold text-vanexa-blue text-lg">0{it.id}</div>
+                <div className="text-lg font-bold text-[#0b63ff]">0{it.id}</div>
                 <div>
-                  <h4 className="font-semibold">{it.title}</h4>
-                  <p className="text-sm text-gray-600">{it.desc}</p>
+                  <h4 className="font-semibold text-[#071033]">{it.title}</h4>
+                  <p className="text-sm leading-6 text-[#384868]">{it.desc}</p>
                 </div>
               </div>
             </motion.div>

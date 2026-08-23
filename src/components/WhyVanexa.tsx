@@ -8,14 +8,14 @@ const items = [
 
 export default function WhyVanexa(){
   return (
-    <section className="section">
+    <section className="section bg-white">
       <div className="container">
-        <h3 className="text-2xl font-semibold">Why Businesses Choose VANEXA</h3>
-        <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <h3 className="text-2xl font-semibold text-[#071033]">Why Businesses Choose VANEXA</h3>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {items.map(it=> (
-            <div key={it.title} className="p-4 border rounded-lg">
-              <h4 className="font-semibold">{it.title}</h4>
-              <p className="text-sm text-gray-600 mt-1">{it.desc}</p>
+            <div key={it.title} className="rounded-xl border border-[#dfe9ff] bg-[#f9fbff] p-4 shadow-sm">
+              <h4 className="font-semibold text-[#071033]">{it.title}</h4>
+              <p className="mt-1 text-sm leading-6 text-[#384868]">{it.desc}</p>
             </div>
           ))}
         </div>
