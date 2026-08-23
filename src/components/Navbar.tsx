@@ -15,7 +15,7 @@ export default function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-40 border-b border-[#2a3d68] bg-[#10264d]/95 backdrop-blur-md">
       <div className="container flex items-center justify-between gap-4 py-3">
         <a href="#home" className="brand-mark flex items-center">
-          <img src="/src/assets/vanexa-logo.png" alt="VANEXA" className="h-12 w-auto object-contain md:h-14" />
+          <img src="/vanexa-logo.png" alt="VANEXA" className="h-12 w-auto object-contain md:h-14" />
         </a>
 
         <nav className="hidden items-center gap-8 text-sm font-medium text-[#edf6ff] md:flex">

@@ -9,7 +9,7 @@ export default function Footer(){
     <footer className="bg-[#10264d] py-8 text-[#edf6ff]">
       <div className="container grid items-start gap-4 md:grid-cols-3">
         <div>
-          <img src="/src/assets/vanexa-logo.png" alt="VANEXA" className="h-14 w-auto object-contain md:h-16" />
+          <img src="/vanexa-logo.png" alt="VANEXA" className="h-14 w-auto object-contain md:h-16" />
           <p className="mt-3 text-sm text-[#cfe1ff]">GROW DIGITALLY. GROW BEYOND.</p>
         </div>
         <div className="text-sm">
