@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 
 export default function Hero(){
   return (
-    <section id="home" className="relative overflow-hidden bg-[linear-gradient(180deg,#edf6ff_0%,#f5faff_100%)] px-0 pb-20 pt-0 md:pb-24 md:pt-0">
+    <section id="home" className="relative overflow-hidden bg-[linear-gradient(180deg,#fffdfa_0%,#f5f2ec_100%)] px-0 pb-20 pt-0 md:pb-24 md:pt-0">
       <div className="hero-grid-bg absolute inset-0 opacity-90" />
       <div className="container relative grid items-center gap-10 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
@@ -10,7 +10,7 @@ export default function Hero(){
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="inline-flex items-center gap-3 rounded-full border border-[#bfd9ff] bg-white/80 px-5 py-2 text-sm text-[#1f2d4c] shadow-[0_8px_24px_rgba(61,122,245,0.08)] backdrop-blur-sm"
+            className="inline-flex items-center gap-3 rounded-full border border-[#d9a441] bg-white/80 px-5 py-2 text-sm text-[#1a1917] shadow-[0_8px_24px_rgba(169,111,36,0.12)] backdrop-blur-sm"
           >
             <span className="h-2.5 w-2.5 rounded-full bg-[#68d6a2] shadow-[0_0_12px_rgba(104,214,162,0.7)]" />
             <span>Pune, Maharashtra</span>
@@ -22,10 +22,10 @@ export default function Hero(){
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mt-8 text-5xl font-black leading-[0.9] tracking-[-0.06em] text-[#10264d] md:text-7xl xl:text-[8rem]"
+            className="mt-8 text-5xl font-black leading-[0.9] tracking-[-0.06em] text-black md:text-7xl xl:text-[8rem]"
           >
-            <span className="block text-[#10264d]">We <span className="text-gradient-brand">build.</span> We</span>
-            <span className="block text-[#10264d]">optimize. <span className="text-gradient-brand">You</span></span>
+            <span className="block text-black">We <span className="text-gradient-brand">build.</span> We</span>
+            <span className="block text-black">optimize. <span className="text-gradient-brand">You</span></span>
             <span className="block text-gradient-brand">grow.</span>
           </motion.h1>
 
@@ -33,10 +33,10 @@ export default function Hero(){
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="mt-8 max-w-2xl text-lg leading-relaxed text-[#405274] md:text-xl"
+            className="mt-8 max-w-2xl text-lg leading-relaxed text-[#5c5750] md:text-xl"
           >
             VANEXA provides digital solutions for your business growth —
-            <span className="text-[#10264d]"> websites, local SEO and Google visibility</span> that turn searches into real customers.
+            <span className="text-black"> websites, local SEO and Google visibility</span> that turn searches into real customers.
           </motion.p>
 
           <motion.div
@@ -45,10 +45,10 @@ export default function Hero(){
             transition={{ delay: 0.4 }}
             className="mt-10 flex flex-col gap-4 sm:flex-row"
           >
-            <a href="#contact" className="inline-flex items-center justify-center rounded-full bg-[#3d7af5] px-7 py-3.5 text-base font-bold text-white shadow-[0_12px_28px_rgba(61,122,245,0.28)] transition hover:brightness-105">
+            <a href="#contact" className="inline-flex items-center justify-center rounded-full bg-[#d9a441] px-7 py-3.5 text-base font-bold text-black shadow-[0_12px_28px_rgba(169,111,36,0.28)] transition hover:bg-[#f4ca74]">
               Start a project <span className="ml-2">→</span>
             </a>
-            <a href="#services" className="inline-flex items-center justify-center rounded-full border border-[#bfd9ff] bg-white px-7 py-3.5 text-base font-semibold text-[#10264d] shadow-[0_8px_20px_rgba(61,122,245,0.08)] transition hover:border-[#3d7af5] hover:text-[#3d7af5]">
+            <a href="#services" className="inline-flex items-center justify-center rounded-full border border-[#d9a441] bg-white px-7 py-3.5 text-base font-semibold text-black shadow-[0_8px_20px_rgba(169,111,36,0.1)] transition hover:border-[#a96f24] hover:text-[#a96f24]">
               See what we do
             </a>
           </motion.div>

@@ -3,9 +3,9 @@ import Footer from '../components/Footer'
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-[#f7fbff] text-[#1f2d4c]">
+    <div className="min-h-screen bg-[#f5f2ec] text-[#1a1917]">
       <Navbar />
-      <section className="section bg-[#f7fbff] pt-28 pb-24 text-[#10264d]">
+      <section className="section bg-[#f5f2ec] pt-28 pb-24 text-black">
         <div className="container max-w-4xl rounded-[28px] border border-[#dfeeff] bg-white p-6 shadow-[0_20px_40px_rgba(61,122,245,0.06)] md:p-10">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#3d7af5]">Privacy Policy</p>
           <h1 className="mt-4 text-3xl font-bold text-[#10264d] md:text-4xl">Privacy Policy</h1>

@@ -12,10 +12,10 @@ export default function Navbar() {
   ]
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 border-b border-[#2a3d68] bg-[#10264d]/95 backdrop-blur-md">
-      <div className="container flex items-center justify-between gap-4 py-3">
-        <a href="#home" className="brand-mark flex items-center">
-          <img src="/vanexa-logo.png" alt="VANEXA" className="h-12 w-auto object-contain md:h-14" />
+    <header className="fixed top-0 left-0 right-0 z-40 border-b border-[#2c2417] bg-black/95 backdrop-blur-md">
+      <div className="container flex items-center justify-between gap-4 py-2">
+        <a href="#home" className="brand-mark flex shrink-0 items-center">
+          <img src="/Vanexa.png" alt="VANEXA Studio" className="h-20 w-20 shrink-0 object-contain md:h-24 md:w-24" />
         </a>
 
         <nav className="hidden items-center gap-8 text-sm font-medium text-[#edf6ff] md:flex">

@@ -6,10 +6,10 @@ const navigateTo = (path: string) => {
 
 export default function Footer(){
   return (
-    <footer className="bg-[#10264d] py-8 text-[#edf6ff]">
+    <footer className="bg-black py-8 text-[#f8f4ed]">
       <div className="container grid items-start gap-4 md:grid-cols-3">
         <div>
-          <img src="/vanexa-logo.png" alt="VANEXA" className="h-14 w-auto object-contain md:h-16" />
+          <img src="/Vanexa.png" alt="VANEXA Studio" className="h-20 w-20 object-contain md:h-24 md:w-24" />
           <p className="mt-3 text-sm text-[#cfe1ff]">GROW DIGITALLY. GROW BEYOND.</p>
         </div>
         <div className="text-sm">

@@ -4,10 +4,10 @@ module.exports = {
     extend: {
       colors: {
         vanexa: {
-          navy: '#071033',
-          blue: '#0b63ff',
-          gold: '#d4a017',
-          light: '#eaf2ff',
+          navy: '#000000',
+          blue: '#d9a441',
+          gold: '#d9a441',
+          light: '#f8f4ed',
           charcoal: '#111216'
         }
       }

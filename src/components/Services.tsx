@@ -1,15 +1,15 @@
 import ServiceCard from './ServiceCard'
 import { services } from '../data/services'
-import { Search, Code, MapPin, Pen, Palette } from 'lucide-react'
+import { Search, Code, MapPin, Pen, Palette, type LucideIcon } from 'lucide-react'
 
-const iconMap:any = { Search, Code, MapPin, Pen, Palette }
+const iconMap: Record<string, LucideIcon> = { Search, Code, MapPin, Pen, Palette }
 
 export default function Services(){
   return (
-    <section id="services" className="section bg-[#f4f7ff]">
+    <section id="services" className="section bg-[#f5f2ec]">
       <div className="container">
-        <h2 className="text-2xl font-semibold text-[#071033]">Everything You Need to Grow Online</h2>
-        <p className="mt-2 max-w-2xl text-[#384868]">From search visibility to websites and creative content, we build the digital foundation your business needs to grow.</p>
+        <h2 className="text-2xl font-semibold text-black">Everything You Need to Grow Online</h2>
+        <p className="mt-2 max-w-2xl text-[#5c5750]">From search visibility to websites and creative content, we build the digital foundation your business needs to grow.</p>
 
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {services.map(s=> (

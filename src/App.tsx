@@ -15,9 +15,9 @@ import TermsPage from './pages/TermsPage'
 
 function HomePage(){
   return (
-    <div className="min-h-screen bg-[#f7fbff] text-[#1f2d4c]">
+    <div className="min-h-screen bg-[#f5f2ec] text-[#1a1917]">
       <Navbar />
-      <main className="pt-0">
+      <main className="pt-24 md:pt-28">
         <Hero />
         <Services />
         <About />
