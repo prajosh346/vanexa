@@ -14,6 +14,13 @@ export const services = [
     cta: 'Build Your Website'
   },
   {
+    id: 'social-ads',
+    title: 'Social Media & Ads Management',
+    description: 'Reach the right audience with performance-driven campaigns, creative content, and consistent brand visibility.',
+    icon: 'Megaphone',
+    cta: 'Grow Your Reach'
+  },
+  {
     id: 'gbp',
     title: 'Google Business Profile',
     description: 'Strengthen your local presence and help nearby customers discover your business.',

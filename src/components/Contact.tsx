@@ -1,6 +1,8 @@
 import emailjs from "@emailjs/browser";
 import { type ChangeEvent, useEffect, useState } from "react";
 
+import SocialMediaIcons from "./SocialMediaIcons";
+
 const EMAILJS_SERVICE_ID =
   import.meta.env.VITE_EMAILJS_SERVICE_ID || "service_4ko9egl";
 
@@ -133,6 +135,13 @@ export default function Contact() {
             <div>Phone: 9405243860</div>
             <div>Location: Pune, Maharashtra, India</div>
           </div>
+
+          <div className="mt-6">
+            <div className="mb-3 text-sm font-semibold uppercase tracking-[0.14em] text-[#071033]">
+              Follow Us
+            </div>
+            <SocialMediaIcons theme="dark" />
+          </div>
         </div>
 
         {/* Contact Form */}
@@ -185,6 +194,7 @@ export default function Contact() {
               <option>Google Business Profile</option>
               <option>Content Writing</option>
               <option>Graphics Design</option>
+              <option>Social Media & Ads Management</option>
               <option>Multiple Services</option>
             </select>
           </div>

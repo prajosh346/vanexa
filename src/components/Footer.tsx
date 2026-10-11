@@ -1,4 +1,6 @@
 
+import SocialMediaIcons from './SocialMediaIcons'
+
 const navigateTo = (path: string) => {
   window.history.pushState({}, '', path)
   window.dispatchEvent(new PopStateEvent('popstate'))
@@ -7,7 +9,7 @@ const navigateTo = (path: string) => {
 export default function Footer(){
   return (
     <footer className="bg-black py-8 text-[#f8f4ed]">
-      <div className="container grid items-start gap-4 md:grid-cols-3">
+      <div className="container grid items-start gap-6 md:grid-cols-3">
         <div>
           <img src="/Vanexa.png" alt="VANEXA Studio" className="h-20 w-20 object-contain md:h-24 md:w-24" />
           <p className="mt-3 text-sm text-[#cfe1ff]">GROW DIGITALLY. GROW BEYOND.</p>
@@ -26,6 +28,10 @@ export default function Footer(){
           <div className="mt-2 space-y-1 text-[#dfeeff]">
             <a href="/privacy-policy" onClick={(e) => { e.preventDefault(); navigateTo('/privacy-policy') }} className="block hover:text-[#d7b15d]">Privacy Policy</a>
             <a href="/terms-and-conditions" onClick={(e) => { e.preventDefault(); navigateTo('/terms-and-conditions') }} className="block hover:text-[#d7b15d]">Terms & Conditions</a>
+          </div>
+          <div className="mt-5">
+            <div className="mb-2 font-semibold text-[#d7b15d]">Follow Us</div>
+            <SocialMediaIcons theme="light" />
           </div>
         </div>
       </div>

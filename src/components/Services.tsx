@@ -1,8 +1,8 @@
 import ServiceCard from './ServiceCard'
 import { services } from '../data/services'
-import { Search, Code, MapPin, Pen, Palette, type LucideIcon } from 'lucide-react'
+import { Search, Code, MapPin, Pen, Palette, Megaphone, type LucideIcon } from 'lucide-react'
 
-const iconMap: Record<string, LucideIcon> = { Search, Code, MapPin, Pen, Palette }
+const iconMap: Record<string, LucideIcon> = { Search, Code, Megaphone, MapPin, Pen, Palette }
 
 export default function Services(){
   return (
