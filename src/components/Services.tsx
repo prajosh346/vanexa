@@ -13,7 +13,7 @@ export default function Services(){
 
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {services.map(s=> (
-            <ServiceCard key={s.id} title={s.title} description={s.description} cta={s.cta} Icon={iconMap[s.icon]} />
+            <ServiceCard key={s.id} title={s.title} description={s.description} cta={s.cta} slug={s.slug} Icon={iconMap[s.icon]} />
           ))}
         </div>
       </div>

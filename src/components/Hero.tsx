@@ -45,12 +45,25 @@ export default function Hero(){
             transition={{ delay: 0.4 }}
             className="mt-10 flex flex-col gap-4 sm:flex-row"
           >
-            <a href="#contact" className="inline-flex items-center justify-center rounded-full bg-[#d9a441] px-7 py-3.5 text-base font-bold text-black shadow-[0_12px_28px_rgba(169,111,36,0.28)] transition hover:bg-[#f4ca74]">
-              Start a project <span className="ml-2">→</span>
+            <a href="#contact" className="inline-flex w-full items-center justify-center rounded-full bg-[#d9a441] px-7 py-3.5 text-base font-bold text-black shadow-[0_12px_28px_rgba(169,111,36,0.28)] transition hover:bg-[#f4ca74] sm:w-auto">
+              Get a quote <span className="ml-2">→</span>
             </a>
-            <a href="#services" className="inline-flex items-center justify-center rounded-full border border-[#d9a441] bg-white px-7 py-3.5 text-base font-semibold text-black shadow-[0_8px_20px_rgba(169,111,36,0.1)] transition hover:border-[#a96f24] hover:text-[#a96f24]">
-              See what we do
+            <a href="https://wa.me/919405243860?text=Hello%20Vanexa%20Studio%2C%20I%20want%20to%20discuss%20my%20digital%20growth%20project." target="_blank" rel="noopener noreferrer" className="inline-flex w-full items-center justify-center rounded-full border border-[#d9a441] bg-white px-7 py-3.5 text-base font-semibold text-black shadow-[0_8px_20px_rgba(169,111,36,0.1)] transition hover:border-[#a96f24] hover:text-[#a96f24] sm:w-auto">
+              WhatsApp us
             </a>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="mt-8 flex flex-wrap gap-3 text-sm text-[#5c5750]"
+          >
+            {['Pune-based agency', 'Website + SEO + Google Business Profile', 'Fast response', 'Custom strategy'].map((item) => (
+              <span key={item} className="rounded-full border border-[#e8dfcf] bg-white/80 px-3 py-2 shadow-sm backdrop-blur-sm">
+                {item}
+              </span>
+            ))}
           </motion.div>
         </div>
 

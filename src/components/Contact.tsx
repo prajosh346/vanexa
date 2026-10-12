@@ -137,6 +137,11 @@ export default function Contact() {
             <div>Location: Pune, Maharashtra, India</div>
           </div>
 
+          <div className="mt-6 rounded-2xl border border-[#dfe9ff] bg-white p-4 shadow-sm">
+            <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[#a96f24]">Fast response</div>
+            <p className="mt-2 text-sm text-[#384868]">We usually respond to new enquiries within 24 hours.</p>
+          </div>
+
           <div className="mt-6">
             <div className="mb-3 text-sm font-semibold uppercase tracking-[0.14em] text-[#071033]">
               Follow Us
@@ -150,65 +155,82 @@ export default function Contact() {
           onSubmit={handleSubmit}
           className="space-y-4 rounded-2xl border border-[#dfe9ff] bg-white p-5 shadow-[0_18px_40px_rgba(7,16,51,0.05)]"
         >
+          <div className="mb-2 text-sm font-semibold uppercase tracking-[0.14em] text-[#a96f24]">Tell us about your needs</div>
+
           {/* Name + Business Name */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <input
-              name="name"
-              type="text"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Name"
-              required
-              className="rounded-lg border border-[#dfe9ff] bg-[#f9fbff] p-3 text-[#071033] outline-none ring-0 placeholder:text-[#6b7b9a] focus:border-[#0b63ff]"
-            />
+            <div>
+              <label className="mb-2 block text-sm font-medium text-[#071033]">Name</label>
+              <input
+                name="name"
+                type="text"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Name"
+                required
+                className="w-full rounded-lg border border-[#dfe9ff] bg-[#f9fbff] p-3 text-[#071033] outline-none ring-0 placeholder:text-[#6b7b9a] focus:border-[#0b63ff]"
+              />
+            </div>
 
-            <input
-              name="businessName"
-              type="text"
-              value={formData.businessName}
-              onChange={handleChange}
-              placeholder="Business Name"
-              className="rounded-lg border border-[#dfe9ff] bg-[#f9fbff] p-3 text-[#071033] outline-none ring-0 placeholder:text-[#6b7b9a] focus:border-[#0b63ff]"
-            />
+            <div>
+              <label className="mb-2 block text-sm font-medium text-[#071033]">Business name</label>
+              <input
+                name="businessName"
+                type="text"
+                value={formData.businessName}
+                onChange={handleChange}
+                placeholder="Business Name"
+                className="w-full rounded-lg border border-[#dfe9ff] bg-[#f9fbff] p-3 text-[#071033] outline-none ring-0 placeholder:text-[#6b7b9a] focus:border-[#0b63ff]"
+              />
+            </div>
           </div>
 
           {/* Phone + Service */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <input
-              name="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={handleChange}
-              placeholder="Phone"
-              required
-              className="rounded-lg border border-[#dfe9ff] bg-[#f9fbff] p-3 text-[#071033] outline-none ring-0 placeholder:text-[#6b7b9a] focus:border-[#0b63ff]"
-            />
+            <div>
+              <label className="mb-2 block text-sm font-medium text-[#071033]">Phone</label>
+              <input
+                name="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder="Phone"
+                required
+                className="w-full rounded-lg border border-[#dfe9ff] bg-[#f9fbff] p-3 text-[#071033] outline-none ring-0 placeholder:text-[#6b7b9a] focus:border-[#0b63ff]"
+              />
+            </div>
 
-            <select
-              name="service"
-              value={formData.service}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-[#dfe9ff] bg-[#f9fbff] p-3 text-[#071033] outline-none focus:border-[#0b63ff]"
-            >
-              <option>SEO</option>
-              <option>Website Development</option>
-              <option>Google Business Profile</option>
-              <option>Content Writing</option>
-              <option>Graphics Design</option>
-              <option>Social Media & Ads Management</option>
-              <option>Multiple Services</option>
-            </select>
+            <div>
+              <label className="mb-2 block text-sm font-medium text-[#071033]">Service</label>
+              <select
+                name="service"
+                value={formData.service}
+                onChange={handleChange}
+                className="w-full rounded-lg border border-[#dfe9ff] bg-[#f9fbff] p-3 text-[#071033] outline-none focus:border-[#0b63ff]"
+              >
+                <option>SEO</option>
+                <option>Website Development</option>
+                <option>Google Business Profile</option>
+                <option>Content Writing</option>
+                <option>Graphics Design</option>
+                <option>Social Media & Ads Management</option>
+                <option>Multiple Services</option>
+              </select>
+            </div>
           </div>
 
           {/* Message */}
-          <textarea
-            name="message"
-            value={formData.message}
-            onChange={handleChange}
-            placeholder="Message"
-            required
-            className="h-32 w-full rounded-lg border border-[#dfe9ff] bg-[#f9fbff] p-3 text-[#071033] outline-none placeholder:text-[#6b7b9a]"
-          />
+          <div>
+            <label className="mb-2 block text-sm font-medium text-[#071033]">Project details</label>
+            <textarea
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
+              placeholder="Tell us about your business goals, timeline and current challenges"
+              required
+              className="h-32 w-full rounded-lg border border-[#dfe9ff] bg-[#f9fbff] p-3 text-[#071033] outline-none placeholder:text-[#6b7b9a]"
+            />
+          </div>
 
           {/* Status */}
           {statusMessage && (
@@ -228,7 +250,7 @@ export default function Contact() {
             <button
               type="submit"
               disabled={!isFormValid || isSubmitting}
-              className="rounded-md bg-linear-to-r from-[#d4a017] to-[#f0c75a] px-6 py-3 font-semibold text-[#071033] shadow-[0_10px_24px_rgba(212,160,23,0.35)] disabled:cursor-not-allowed disabled:opacity-55"
+              className="w-full rounded-md bg-linear-to-r from-[#d4a017] to-[#f0c75a] px-6 py-3 font-semibold text-[#071033] shadow-[0_10px_24px_rgba(212,160,23,0.35)] disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto"
             >
               {isSubmitting ? "Sending..." : "Send Enquiry"}
             </button>
@@ -237,7 +259,7 @@ export default function Contact() {
               href={buildWhatsAppUrl(getWhatsAppTemplate(formData.service))}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-md border border-[#25D366] bg-[#25D366] px-6 py-3 font-semibold text-white shadow-[0_10px_24px_rgba(37,211,102,0.25)] transition hover:translate-y-[-1px] hover:bg-[#20bf5b]"
+              className="inline-flex w-full items-center justify-center rounded-md border border-[#25D366] bg-[#25D366] px-6 py-3 font-semibold text-white shadow-[0_10px_24px_rgba(37,211,102,0.25)] transition hover:translate-y-[-1px] hover:bg-[#20bf5b] sm:w-auto"
             >
               WhatsApp Us
             </a>
