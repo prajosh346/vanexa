@@ -25,6 +25,7 @@ import {
   AuthorBlogEditorPage,
   AuthorBlogListPage,
   AuthorDashboardPage,
+  ProtectedRoute,
 } from './pages/AdminPages'
 
 const servicePageMeta: Record<string, ServicePageMeta> = {
@@ -80,6 +81,19 @@ const servicePageMeta: Record<string, ServicePageMeta> = {
       { q: 'Can social media help local businesses?', a: 'Yes. For local businesses, social media helps with visibility, trust-building, community engagement and lead generation.' },
     ],
   },
+  '/services/content-writing': {
+    slug: 'content-writing',
+    title: 'Content Writing Services in Pune | Vanexa Studio',
+    description: 'Website content writing and SEO content services in Pune to help businesses communicate clearly, build trust and improve search visibility.',
+    keywords: 'content writing services Pune, website content writing, SEO content writing, business content creation',
+    heading: 'Content Writing for Business Growth',
+    intro: 'Clear, useful content helps customers understand your offer and take the next step. Vanexa Studio supports website and SEO content shaped around your audience, services and business goals.',
+    highlights: ['Website page content', 'SEO-focused content planning', 'Business and service descriptions', 'Clear calls to action'],
+    faqs: [
+      { q: 'Can you write content for existing websites?', a: 'Yes. We can improve existing website copy or create new service and landing page content based on your audience and goals.' },
+      { q: 'Do you provide SEO content writing?', a: 'Yes. Content can be planned around relevant search intent while remaining useful and clear for your customers.' },
+    ],
+  },
   '/services/graphic-design': {
     slug: 'graphic-design',
     title: 'Graphic Design & Branding Services in Pune | Vanexa Studio',
@@ -105,13 +119,46 @@ function updatePageMeta(title: string, description: string, keywords?: string) {
     document.head.appendChild(metaDescription)
   }
 
+  const openGraphTitle = document.querySelector('meta[property="og:title"]') ?? document.createElement('meta')
+  openGraphTitle.setAttribute('property', 'og:title')
+  openGraphTitle.setAttribute('content', title)
+  if (!openGraphTitle.parentNode) {
+    document.head.appendChild(openGraphTitle)
+  }
+
+  const openGraphDescription = document.querySelector('meta[property="og:description"]') ?? document.createElement('meta')
+  openGraphDescription.setAttribute('property', 'og:description')
+  openGraphDescription.setAttribute('content', description)
+  if (!openGraphDescription.parentNode) {
+    document.head.appendChild(openGraphDescription)
+  }
+
+  const canonical = document.querySelector('link[rel="canonical"]') ?? document.createElement('link')
+  canonical.setAttribute('rel', 'canonical')
+  canonical.setAttribute('href', `${window.location.origin}${window.location.pathname}`)
+  if (!canonical.parentNode) {
+    document.head.appendChild(canonical)
+  }
+
+  const metaKeywords = document.querySelector('meta[name="keywords"]')
   if (keywords) {
-    const metaKeywords = document.querySelector('meta[name="keywords"]') ?? document.createElement('meta')
-    metaKeywords.setAttribute('name', 'keywords')
-    metaKeywords.setAttribute('content', keywords)
-    if (!metaKeywords.parentNode) {
-      document.head.appendChild(metaKeywords)
-    }
+    const keywordMeta = metaKeywords ?? document.createElement('meta')
+    keywordMeta.setAttribute('name', 'keywords')
+    keywordMeta.setAttribute('content', keywords)
+    if (!keywordMeta.parentNode) document.head.appendChild(keywordMeta)
+  } else {
+    metaKeywords?.remove()
+  }
+
+  const privateRoute = /^\/(admin|author)(\/|$)/.test(window.location.pathname)
+  const robotsMeta = document.querySelector('meta[name="robots"]')
+  if (privateRoute) {
+    const privateRobotsMeta = robotsMeta ?? document.createElement('meta')
+    privateRobotsMeta.setAttribute('name', 'robots')
+    privateRobotsMeta.setAttribute('content', 'noindex,nofollow')
+    if (!privateRobotsMeta.parentNode) document.head.appendChild(privateRobotsMeta)
+  } else {
+    robotsMeta?.remove()
   }
 }
 
@@ -131,6 +178,24 @@ function HomePage() {
         <FAQ />
         <CTA />
         <Contact />
+      </main>
+      <Footer />
+      <WhatsAppButton />
+    </div>
+  )
+}
+
+function NotFoundPage() {
+  return (
+    <div className="min-h-screen bg-[#f5f2ec] text-[#1a1917]">
+      <Navbar />
+      <main className="container flex min-h-[70vh] flex-col items-center justify-center px-4 pt-28 text-center">
+        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#a96f24]">404</p>
+        <h1 className="mt-3 text-4xl font-black text-black">This page could not be found.</h1>
+        <p className="mt-3 max-w-lg text-[#5c5750]">The page may have moved or the address may be incorrect.</p>
+        <a href="/" className="mt-6 rounded-full bg-[#d9a441] px-5 py-3 font-semibold text-black">
+          Back to homepage
+        </a>
       </main>
       <Footer />
       <WhatsAppButton />
@@ -201,6 +266,29 @@ function App() {
       return
     }
 
+    if (path === '/admin/login') {
+      updatePageMeta('Admin / Author Login | Vanexa Studio', 'Sign in to the protected Vanexa Studio content workspace.')
+      return
+    }
+
+    const protectedPageTitles: Record<string, string> = {
+      '/admin/dashboard': 'Admin Dashboard | Vanexa Studio',
+      '/admin/blogs/new': 'Create Blog | Vanexa Studio',
+      '/author/dashboard': 'Author Dashboard | Vanexa Studio',
+      '/author/blogs': 'Author Articles | Vanexa Studio',
+      '/author/blogs/new': 'Create Article | Vanexa Studio',
+    }
+    const protectedPageTitle = protectedPageTitles[path] ?? (/^\/(admin|author)\/blogs\/\d+\/edit$/.test(path) ? 'Edit Article | Vanexa Studio' : null)
+    if (protectedPageTitle) {
+      updatePageMeta(protectedPageTitle, 'Manage content in the protected Vanexa Studio workspace.')
+      return
+    }
+
+    if (path !== '/') {
+      updatePageMeta('Page Not Found | Vanexa Studio', 'The requested page could not be found on Vanexa Studio.')
+      return
+    }
+
     updatePageMeta(
       'Vanexa Studio | Digital Marketing, SEO & Web Development Pune',
       'Vanexa Studio helps businesses grow online with website development and updates, SEO and AI search optimization, Google Business Profile management, social media marketing and graphic design.',
@@ -220,20 +308,25 @@ function App() {
     if (slug) return <BlogDetailPage slug={slug} />
   }
   if (path === '/admin/login') return <AdminLoginPage />
-  if (path === '/admin/dashboard') return <AdminDashboardPage />
-  if (path === '/author/dashboard') return <AuthorDashboardPage />
-  if (path === '/author/blogs') return <AuthorBlogListPage />
-  if (path === '/author/blogs/new') return <AuthorBlogEditorPage />
+  if (path === '/admin/dashboard') return <ProtectedRoute requiredRole="ADMIN"><AdminDashboardPage /></ProtectedRoute>
+  if (path === '/admin/blogs/new') return <ProtectedRoute requiredRole="ADMIN"><AuthorBlogEditorPage key="admin-new" role="ADMIN" /></ProtectedRoute>
+  if (/^\/admin\/blogs\/\d+\/edit$/.test(path)) {
+    const blogId = Number(path.split('/')[3])
+    return <ProtectedRoute requiredRole="ADMIN"><AuthorBlogEditorPage key={`admin-${blogId}`} role="ADMIN" blogId={blogId} /></ProtectedRoute>
+  }
+  if (path === '/author/dashboard') return <ProtectedRoute requiredRole="AUTHOR"><AuthorDashboardPage /></ProtectedRoute>
+  if (path === '/author/blogs') return <ProtectedRoute requiredRole="AUTHOR"><AuthorBlogListPage /></ProtectedRoute>
+  if (path === '/author/blogs/new') return <ProtectedRoute requiredRole="AUTHOR"><AuthorBlogEditorPage key="new" /></ProtectedRoute>
   if (/^\/author\/blogs\/\d+\/edit$/.test(path)) {
     const blogId = Number(path.split('/')[3])
-    return <AuthorBlogEditorPage blogId={blogId} />
+    return <ProtectedRoute requiredRole="AUTHOR"><AuthorBlogEditorPage key={blogId} role="AUTHOR" blogId={blogId} /></ProtectedRoute>
   }
   if (path.startsWith('/services/')) {
     const routeMeta = servicePageMeta[path]
     if (routeMeta) return <ServiceLandingPage {...routeMeta} />
   }
 
-  return <HomePage />
+  return path === '/' ? <HomePage /> : <NotFoundPage />
 }
 
 export default App

@@ -32,6 +32,7 @@ function BlogCard({ blog }: { blog: BlogArticle }) {
         <img
           src={blog.featuredImageUrl || 'https://placehold.co/1200x630/png'}
           alt={blog.title}
+          onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = '/Vanexa.png'; event.currentTarget.alt = 'Vanexa Studio' }}
           className="h-56 w-full object-cover"
           loading="lazy"
         />
@@ -167,6 +168,8 @@ export default function BlogListPage() {
             value={keyword}
             onChange={(event) => {
               setKeyword(event.target.value)
+              setSelectedCategory('all')
+              setSelectedTag('all')
               setPage(0)
             }}
             placeholder="Search by keyword, topic, or service"
@@ -177,6 +180,8 @@ export default function BlogListPage() {
             value={selectedCategory}
             onChange={(event) => {
               setSelectedCategory(event.target.value === 'all' ? 'all' : Number(event.target.value))
+              setKeyword('')
+              setSelectedTag('all')
               setPage(0)
             }}
             className="w-full rounded-2xl border border-[#e8dfcf] bg-[#f9fbff] px-4 py-3 text-sm text-[#1a1917] outline-none focus:border-[#d9a441]"
@@ -193,6 +198,8 @@ export default function BlogListPage() {
             value={selectedTag}
             onChange={(event) => {
               setSelectedTag(event.target.value === 'all' ? 'all' : Number(event.target.value))
+              setKeyword('')
+              setSelectedCategory('all')
               setPage(0)
             }}
             className="w-full rounded-2xl border border-[#e8dfcf] bg-[#f9fbff] px-4 py-3 text-sm text-[#1a1917] outline-none focus:border-[#d9a441]"

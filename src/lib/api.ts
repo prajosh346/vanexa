@@ -3,6 +3,17 @@ import type { ApiCategory, ApiTag, BlogArticle, BlogStatusRequest, BlogUpsertPay
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? 'https://vanexa-backend.onrender.com').replace(/\/+$/, '')
 
 export const apiBaseUrl = API_BASE_URL
+let logoutRequest: Promise<boolean> | null = null
+
+const statusMessages: Record<number, string> = {
+  400: 'Check the submitted information and try again.',
+  401: 'Your session is invalid or expired. Please sign in again.',
+  403: 'You do not have permission to perform this action.',
+  404: 'The requested item could not be found.',
+  409: 'This request conflicts with the current server state.',
+  413: 'The upload or request is too large.',
+  500: 'The server encountered an error. Please try again later.',
+}
 
 export function getStoredSession() {
   const raw = localStorage.getItem('vanexa_auth_session')
@@ -27,7 +38,7 @@ async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T
   const token = getStoredSession()?.token
   const headers = new Headers(options.headers ?? {})
 
-  if (!(options.body instanceof FormData)) {
+  if (options.body !== undefined && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json')
   }
 
@@ -42,13 +53,22 @@ async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T
   })
 
   const text = await response.text()
-  const payload = text ? JSON.parse(text) : null
+  let payload: unknown = null
+  if (text) {
+    try {
+      payload = JSON.parse(text)
+    } catch {
+      payload = text
+    }
+  }
 
   if (!response.ok) {
-    const message =
-      payload?.message ??
-      payload?.error ??
-      'Request failed. Please try again.'
+    const payloadMessage = typeof payload === 'string'
+      ? payload.trimStart().startsWith('<') ? '' : payload.trim()
+      : payload && typeof payload === 'object'
+        ? String((payload as { message?: unknown; error?: unknown }).message ?? (payload as { error?: unknown }).error ?? '')
+        : ''
+    const message = payloadMessage || statusMessages[response.status] || 'Request failed. Please try again.'
     throw new Error(message)
   }
 
@@ -179,18 +199,23 @@ export async function loginUser(payload: Record<string, string>): Promise<LoginA
   }
 }
 
-export async function logoutUser(): Promise<void> {
+export function logoutUser(): Promise<boolean> {
+  if (logoutRequest) return logoutRequest
+
   const token = getStoredSession()?.token
   if (!token) {
     clearStoredSession()
-    return
+    return Promise.resolve(false)
   }
 
-  try {
-    await apiRequest<void>('/api/auth/logout', {
+  logoutRequest = apiRequest<void>('/api/auth/logout', {
       method: 'POST',
     })
-  } finally {
-    clearStoredSession()
-  }
+    .then(() => true)
+    .finally(() => {
+      clearStoredSession()
+      logoutRequest = null
+    })
+
+  return logoutRequest
 }

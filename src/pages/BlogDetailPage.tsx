@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { ArrowLeft, Bookmark } from 'lucide-react'
 
 import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
@@ -9,6 +10,17 @@ import type { BlogArticle } from '../types/api'
 const navigateTo = (path: string) => {
   window.history.pushState({}, '', path)
   window.dispatchEvent(new PopStateEvent('popstate'))
+}
+
+const savedArticlesStorageKey = 'vanexa_saved_blog_slugs'
+
+function getSavedArticleSlugs() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(savedArticlesStorageKey) ?? '[]')
+    return Array.isArray(saved) ? saved.filter((slug): slug is string => typeof slug === 'string') : []
+  } catch {
+    return []
+  }
 }
 
 function formatDate(value?: string) {
@@ -26,7 +38,34 @@ type RichTextNode = {
   type?: string
   text?: string
   attrs?: Record<string, string>
+  marks?: Array<{ type?: string; attrs?: Record<string, string> }>
   content?: RichTextNode[]
+}
+
+function safeLinkHref(value?: string) {
+  if (!value) return null
+  const href = value.trim()
+  if (href.startsWith('/') || href.startsWith('#')) return href
+
+  try {
+    const url = new URL(href)
+    return ['http:', 'https:', 'mailto:', 'tel:'].includes(url.protocol) ? url.href : null
+  } catch {
+    return null
+  }
+}
+
+function safeImageSource(value?: string) {
+  if (!value) return null
+  const src = value.trim()
+  if (src.startsWith('/')) return src
+
+  try {
+    const url = new URL(src)
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : null
+  } catch {
+    return null
+  }
 }
 
 function renderNode(node: RichTextNode | null | undefined, index: string | number): ReactNode {
@@ -34,7 +73,20 @@ function renderNode(node: RichTextNode | null | undefined, index: string | numbe
 
   const content = node.content ?? []
 
-  if (node.type === 'text') return <>{node.text ?? ''}</>
+  if (node.type === 'text') {
+    let rendered: ReactNode = node.text ?? ''
+    for (const mark of node.marks ?? []) {
+      if (mark.type === 'bold') rendered = <strong>{rendered}</strong>
+      if (mark.type === 'italic') rendered = <em>{rendered}</em>
+      if (mark.type === 'strike') rendered = <s>{rendered}</s>
+      if (mark.type === 'code') rendered = <code>{rendered}</code>
+      if (mark.type === 'link') {
+        const href = safeLinkHref(mark.attrs?.href)
+        if (href) rendered = <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#a96f24] underline decoration-[#d9a441] underline-offset-2">{rendered}</a>
+      }
+    }
+    return <>{rendered}</>
+  }
   if (node.type === 'paragraph') {
     return <p key={index} className="mb-5 leading-8 text-[#2d2a27]">{content.map((child, childIndex) => renderNode(child, `${String(index)}-${childIndex}`))}</p>
   }
@@ -60,13 +112,19 @@ function renderNode(node: RichTextNode | null | undefined, index: string | numbe
     return <pre key={index} className="mb-5 overflow-x-auto rounded-2xl bg-[#111827] p-4 text-sm text-[#f9fafb]"><code>{node.content?.[0]?.text ?? ''}</code></pre>
   }
   if (node.type === 'image') {
-    return <img key={index} src={node.attrs?.src ?? ''} alt={node.attrs?.alt ?? 'Article visual'} className="my-6 w-full rounded-3xl object-cover shadow-sm" />
+    const src = safeImageSource(node.attrs?.src)
+    if (!src) return null
+    return <img key={index} src={src} alt={node.attrs?.alt ?? 'Article visual'} onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = '/Vanexa.png'; event.currentTarget.alt = 'Vanexa Studio' }} className="my-6 w-full rounded-3xl object-cover shadow-sm" />
   }
   if (node.type === 'hardBreak') {
     return <br key={index} />
   }
   if (node.type === 'link') {
-    return <a key={index} href={node.attrs?.href || '#'} target="_blank" rel="noreferrer" className="text-[#a96f24] underline decoration-[#d9a441] underline-offset-2">{content.map((child, childIndex) => renderNode(child, `${String(index)}-${childIndex}`))}</a>
+    const href = safeLinkHref(node.attrs?.href)
+    const renderedContent = content.map((child, childIndex) => renderNode(child, `${String(index)}-${childIndex}`))
+    return href
+      ? <a key={index} href={href} target="_blank" rel="noopener noreferrer" className="text-[#a96f24] underline decoration-[#d9a441] underline-offset-2">{renderedContent}</a>
+      : <span key={index}>{renderedContent}</span>
   }
   if (content.length > 0) {
     return <>{content.map((child, childIndex) => renderNode(child, `${String(index)}-${childIndex}`))}</>
@@ -82,7 +140,7 @@ function getContentNodes(content: string): RichTextNode[] {
     const parsed = JSON.parse(content)
     return Array.isArray(parsed.content) ? parsed.content : []
   } catch {
-    return []
+    return [{ type: 'paragraph', content: [{ type: 'text', text: content }] }]
   }
 }
 
@@ -90,6 +148,8 @@ export default function BlogDetailPage({ slug }: { slug?: string }) {
   const [blog, setBlog] = useState<BlogArticle | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [savedSlugs, setSavedSlugs] = useState<string[]>(getSavedArticleSlugs)
+  const [saveError, setSaveError] = useState('')
   const viewSent = useRef(false)
 
   const currentSlug = slug || window.location.pathname.split('/blog/')[1]
@@ -98,6 +158,7 @@ export default function BlogDetailPage({ slug }: { slug?: string }) {
     let active = true
 
     const loadBlog = async () => {
+      viewSent.current = false
       setLoading(true)
       setError('')
 
@@ -105,12 +166,24 @@ export default function BlogDetailPage({ slug }: { slug?: string }) {
         const result = await fetchPublicBlogBySlug(currentSlug)
         if (!active) return
         setBlog(result)
-        document.title = result.seoTitle || result.title
+        const title = result.seoTitle || result.title
+        const description = result.seoDescription || result.excerpt
+        document.title = title
 
         const metaDescription = document.querySelector('meta[name="description"]') ?? document.createElement('meta')
         metaDescription.setAttribute('name', 'description')
-        metaDescription.setAttribute('content', result.seoDescription || result.excerpt)
+        metaDescription.setAttribute('content', description)
         if (!metaDescription.parentNode) document.head.appendChild(metaDescription)
+
+        const openGraphTitle = document.querySelector('meta[property="og:title"]') ?? document.createElement('meta')
+        openGraphTitle.setAttribute('property', 'og:title')
+        openGraphTitle.setAttribute('content', title)
+        if (!openGraphTitle.parentNode) document.head.appendChild(openGraphTitle)
+
+        const openGraphDescription = document.querySelector('meta[property="og:description"]') ?? document.createElement('meta')
+        openGraphDescription.setAttribute('property', 'og:description')
+        openGraphDescription.setAttribute('content', description)
+        if (!openGraphDescription.parentNode) document.head.appendChild(openGraphDescription)
       } catch (err) {
         if (!active) return
         setError(err instanceof Error ? err.message : 'This article could not be found.')
@@ -150,6 +223,31 @@ export default function BlogDetailPage({ slug }: { slug?: string }) {
     }
 
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank', 'noopener,noreferrer')
+  }
+
+  const goBack = () => {
+    if (window.history.length > 1) {
+      window.history.back()
+    } else {
+      navigateTo('/blog')
+    }
+  }
+
+  const toggleSavedArticle = () => {
+    if (!blog) return
+
+    const isSaved = savedSlugs.includes(blog.slug)
+    const nextSavedSlugs = isSaved
+      ? savedSlugs.filter((savedSlug) => savedSlug !== blog.slug)
+      : [...savedSlugs, blog.slug]
+
+    try {
+      localStorage.setItem(savedArticlesStorageKey, JSON.stringify(nextSavedSlugs))
+      setSavedSlugs(nextSavedSlugs)
+      setSaveError('')
+    } catch {
+      setSaveError('This article could not be saved in this browser.')
+    }
   }
 
   if (loading) {
@@ -195,12 +293,13 @@ export default function BlogDetailPage({ slug }: { slug?: string }) {
     <div className="min-h-screen bg-[#f5f2ec] text-[#1a1917]">
       <Navbar />
       <article className="container max-w-4xl pb-20 pt-32 md:pt-36">
-        <button type="button" onClick={() => navigateTo('/blog')} className="mb-6 inline-flex items-center rounded-full border border-[#d9a441] bg-white px-4 py-2 text-sm font-semibold text-[#1a1917]">
-          ← Back to blog
+        <button type="button" onClick={goBack} className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#d9a441] bg-white px-4 py-2 text-sm font-semibold text-[#1a1917]">
+          <ArrowLeft size={16} aria-hidden="true" />
+          Back
         </button>
 
         <div className="overflow-hidden rounded-[28px] border border-[#e8dfcf] bg-white shadow-[0_20px_56px_rgba(0,0,0,0.04)]">
-          <img src={blog.featuredImageUrl || 'https://placehold.co/1200x630/png'} alt={blog.title} className="h-[280px] w-full object-cover md:h-[420px]" />
+          <img src={blog.featuredImageUrl || 'https://placehold.co/1200x630/png'} alt={blog.title} onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = '/Vanexa.png'; event.currentTarget.alt = 'Vanexa Studio' }} className="h-[280px] w-full object-cover md:h-[420px]" />
 
           <div className="p-6 md:p-10">
             <div className="flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#5c5750]">
@@ -224,6 +323,15 @@ export default function BlogDetailPage({ slug }: { slug?: string }) {
             </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={toggleSavedArticle}
+                aria-pressed={savedSlugs.includes(blog.slug)}
+                className="inline-flex items-center gap-2 rounded-full border border-[#d9a441] bg-white px-4 py-2 text-sm font-semibold text-[#1a1917]"
+              >
+                <Bookmark size={16} fill={savedSlugs.includes(blog.slug) ? 'currentColor' : 'none'} aria-hidden="true" />
+                {savedSlugs.includes(blog.slug) ? 'Saved' : 'Save article'}
+              </button>
               <button type="button" onClick={copyLink} className="rounded-full bg-[#d9a441] px-4 py-2 text-sm font-semibold text-black">
                 Copy link
               </button>
@@ -231,6 +339,7 @@ export default function BlogDetailPage({ slug }: { slug?: string }) {
                 Share
               </button>
             </div>
+            {saveError && <p role="status" className="mt-3 text-sm text-[#8f2c2c]">{saveError}</p>}
 
             <div className="prose prose-lg mt-8 max-w-none text-[#1a1917]">
               {contentNodes.map((node: RichTextNode, index: number) => renderNode(node, index))}

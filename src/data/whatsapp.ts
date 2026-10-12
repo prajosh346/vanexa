@@ -11,6 +11,8 @@ export const whatsappTemplates = {
     'Hello Vanexa Studio, I am looking for social media management and promotional creatives for my business.',
   graphicDesign:
     'Hello Vanexa Studio, I need graphic design and branding services. Please share your packages and process.',
+  contentWriting:
+    'Hello Vanexa Studio, I need website and SEO content writing support for my business. Please share your process and quotation.',
   general:
     'Hello Vanexa Studio, I would like to discuss digital marketing services for my business.',
 } as const;
@@ -36,6 +38,10 @@ export function getWhatsAppTemplate(service: string) {
 
   if (normalized.includes('social') || normalized.includes('media')) {
     return whatsappTemplates.socialMediaManagement;
+  }
+
+  if (normalized.includes('content') || normalized.includes('writing')) {
+    return whatsappTemplates.contentWriting;
   }
 
   if (normalized.includes('graphic') || normalized.includes('design') || normalized.includes('branding')) {

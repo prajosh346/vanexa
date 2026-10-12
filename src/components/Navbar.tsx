@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { clearStoredSession, getStoredSession, logoutUser } from '../lib/api'
 
@@ -9,6 +9,8 @@ const navigateTo = (path: string) => {
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [logoutNotice, setLogoutNotice] = useState(() => sessionStorage.getItem('vanexa_logout_notice') ?? '')
   const session = getStoredSession()
   const isAuthenticated = Boolean(session?.token)
   const dashboardPath = session?.role === 'ADMIN' ? '/admin/dashboard' : session?.role === 'AUTHOR' ? '/author/dashboard' : '/admin/login'
@@ -22,13 +24,28 @@ export default function Navbar() {
     { label: 'Contact', href: '/contact' },
   ]
 
+  useEffect(() => {
+    if (!logoutNotice) return
+    sessionStorage.removeItem('vanexa_logout_notice')
+    const timer = window.setTimeout(() => setLogoutNotice(''), 5000)
+    return () => window.clearTimeout(timer)
+  }, [logoutNotice])
+
   const handleLogout = async () => {
+    if (isLoggingOut) return
+    setIsLoggingOut(true)
+
+    let notice = 'Signed out on this device. Server token revocation could not be confirmed.'
     try {
-      await logoutUser()
+      const revoked = await logoutUser()
+      notice = revoked ? 'You have been signed out.' : 'Your local session has been cleared.'
     } catch {
       clearStoredSession()
+    } finally {
+      sessionStorage.setItem('vanexa_logout_notice', notice)
+      setIsLoggingOut(false)
+      navigateTo('/')
     }
-    navigateTo('/')
   }
 
   return (
@@ -52,8 +69,8 @@ export default function Navbar() {
               <button type="button" onClick={() => navigateTo(dashboardPath)} className="inline-flex items-center rounded-full border border-[#d7b15d] bg-transparent px-4 py-2.5 text-sm font-semibold text-[#edf6ff] transition hover:border-[#f0cb7a] hover:text-[#f0cb7a]">
                 Dashboard
               </button>
-              <button type="button" onClick={() => { void handleLogout() }} className="inline-flex items-center rounded-full border border-[#d7b15d] bg-transparent px-4 py-2.5 text-sm font-semibold text-[#edf6ff] transition hover:border-[#f0cb7a] hover:text-[#f0cb7a]">
-                Logout
+              <button type="button" disabled={isLoggingOut} onClick={() => { void handleLogout() }} className="inline-flex items-center rounded-full border border-[#d7b15d] bg-transparent px-4 py-2.5 text-sm font-semibold text-[#edf6ff] transition hover:border-[#f0cb7a] hover:text-[#f0cb7a] disabled:cursor-not-allowed disabled:opacity-50">
+                {isLoggingOut ? 'Signing out...' : 'Logout'}
               </button>
             </>
           ) : (
@@ -85,6 +102,12 @@ export default function Navbar() {
           </button>
         </div>
       </div>
+
+      {logoutNotice && (
+        <div role="status" aria-live="polite" className="fixed left-1/2 top-28 z-50 w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 rounded-xl border border-[#e8dfcf] bg-white px-5 py-4 text-sm font-semibold text-[#1a1917] shadow-lg">
+          {logoutNotice}
+        </div>
+      )}
 
       {isOpen && (
         <div className="border-t border-[#2a3d68] bg-[#10264d] md:hidden">
@@ -120,9 +143,10 @@ export default function Navbar() {
                     setIsOpen(false)
                     void handleLogout()
                   }}
-                  className="mt-2 inline-flex items-center justify-center rounded-full border border-[#d7b15d] bg-transparent px-5 py-3 text-base font-bold text-[#edf6ff]"
+                  disabled={isLoggingOut}
+                  className="mt-2 inline-flex items-center justify-center rounded-full border border-[#d7b15d] bg-transparent px-5 py-3 text-base font-bold text-[#edf6ff] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Logout
+                  {isLoggingOut ? 'Signing out...' : 'Logout'}
                 </button>
               </>
             ) : (

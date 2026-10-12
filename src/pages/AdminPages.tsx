@@ -24,11 +24,14 @@ const navigateTo = (path: string) => {
 }
 
 const signOutAndRedirect = async (redirectPath = '/') => {
+  let notice = 'Signed out on this device. Server token revocation could not be confirmed.'
   try {
-    await logoutUser()
+    const revoked = await logoutUser()
+    notice = revoked ? 'You have been signed out.' : 'Your local session has been cleared.'
   } catch {
     clearStoredSession()
   } finally {
+    sessionStorage.setItem('vanexa_logout_notice', notice)
     navigateTo(redirectPath)
   }
 }
@@ -53,11 +56,63 @@ function blogSlugify(value: string) {
     .replace(/-+/g, '-')
 }
 
+type EditorContentNode = {
+  type?: string
+  text?: string
+  attrs?: { level?: number; alt?: string }
+  content?: EditorContentNode[]
+}
+
+function inlineEditorText(nodes: EditorContentNode[] = []): string {
+  return nodes.map((node) => {
+    if (node.type === 'text') return node.text ?? ''
+    if (node.type === 'hardBreak') return '\n'
+    return inlineEditorText(node.content)
+  }).join('')
+}
+
+function blockEditorText(node: EditorContentNode): string {
+  if (node.type === 'paragraph' || node.type === 'heading') return inlineEditorText(node.content)
+  if (node.type === 'bulletList') {
+    return (node.content ?? []).map((item) => `- ${inlineEditorText(item.content?.[0]?.content)}`).join('\n')
+  }
+  if (node.type === 'orderedList') {
+    return (node.content ?? []).map((item, index) => `${index + 1}. ${inlineEditorText(item.content?.[0]?.content)}`).join('\n')
+  }
+  if (node.type === 'codeBlock') return inlineEditorText(node.content)
+  if (node.type === 'image') return node.attrs?.alt ? `[Image: ${node.attrs.alt}]` : '[Image]'
+  return inlineEditorText(node.content)
+}
+
+function contentToEditorText(content: string): string {
+  if (!content) return ''
+
+  try {
+    const parsed = JSON.parse(content) as { type?: string; content?: EditorContentNode[] }
+    if (parsed.type !== 'doc' || !Array.isArray(parsed.content)) return content
+    return parsed.content.map(blockEditorText).join('\n\n')
+  } catch {
+    return content
+  }
+}
+
+function editorTextToContent(text: string): string {
+  return JSON.stringify({
+    type: 'doc',
+    content: text.split(/\r?\n/).map((line) => ({
+      type: 'paragraph',
+      content: line ? [{ type: 'text', text: line }] : [],
+    })),
+  })
+}
+
 type BlogFormState = {
   title: string
   slug: string
   excerpt: string
   content: string
+  originalContent: string
+  originalContentText: string
   featuredImageUrl: string
   categoryId: number | ''
   status: BlogStatus
@@ -74,6 +129,8 @@ const getInitialForm = (): BlogFormState => ({
   slug: '',
   excerpt: '',
   content: '',
+  originalContent: '',
+  originalContentText: '',
   featuredImageUrl: '',
   categoryId: '',
   status: 'DRAFT',
@@ -172,7 +229,7 @@ export function AdminLoginPage() {
   )
 }
 
-function ProtectedRoute({ requiredRole, children }: { requiredRole?: 'ADMIN' | 'AUTHOR'; children: React.ReactNode }) {
+export function ProtectedRoute({ requiredRole, children }: { requiredRole?: 'ADMIN' | 'AUTHOR'; children: React.ReactNode }) {
   const session = getStoredSession()
 
   if (!session?.token) {
@@ -284,9 +341,14 @@ export function AdminDashboardPage() {
               <div className="mt-10 rounded-3xl border border-[#e8dfcf] bg-white p-6 shadow-sm">
                 <div className="mb-5 flex items-center justify-between gap-3">
                   <h2 className="text-2xl font-bold text-black">Recent posts</h2>
-                  <button type="button" onClick={() => navigateTo('/blog')} className="rounded-full bg-[#d9a441] px-4 py-2 text-sm font-semibold text-black">
-                    Open public blog
-                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={() => navigateTo('/admin/blogs/new')} className="rounded-full bg-[#d9a441] px-4 py-2 text-sm font-semibold text-black">
+                      Create blog
+                    </button>
+                    <button type="button" onClick={() => navigateTo('/blog')} className="rounded-full border border-[#d9a441] bg-white px-4 py-2 text-sm font-semibold text-[#1a1917]">
+                      Open public blog
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-4">
@@ -296,7 +358,12 @@ export function AdminDashboardPage() {
                         <div className="text-xs font-bold uppercase tracking-[0.14em] text-[#a96f24]">{blog.status || 'PUBLISHED'}</div>
                         <h3 className="mt-2 text-xl font-bold text-black">{blog.title}</h3>
                       </div>
-                      <div className="text-sm text-[#5c5750]">{formatDate(blog.updatedAt || blog.publishedAt || blog.createdAt)}</div>
+                      <div className="flex items-center gap-3 text-sm text-[#5c5750]">
+                        <span>{formatDate(blog.updatedAt || blog.publishedAt || blog.createdAt)}</span>
+                        <button type="button" onClick={() => navigateTo(`/admin/blogs/${blog.id}/edit`)} className="rounded-full border border-[#d9a441] bg-white px-4 py-2 font-semibold text-[#1a1917]">
+                          Edit
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -314,6 +381,7 @@ export function AuthorDashboardPage() {
   const [blogs, setBlogs] = useState<BlogArticle[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [updatingBlogId, setUpdatingBlogId] = useState<number | null>(null)
 
   useEffect(() => {
     let active = true
@@ -336,6 +404,19 @@ export function AuthorDashboardPage() {
       active = false
     }
   }, [])
+
+  const changeBlogStatus = async (blogId: number, status: BlogStatus) => {
+    setUpdatingBlogId(blogId)
+    setError('')
+    try {
+      await updateBlogStatus(blogId, status)
+      setBlogs((current) => current.map((blog) => blog.id === blogId ? { ...blog, status } : blog))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to update the article status.')
+    } finally {
+      setUpdatingBlogId(null)
+    }
+  }
 
   return (
     <ProtectedRoute requiredRole="AUTHOR">
@@ -400,12 +481,12 @@ export function AuthorDashboardPage() {
                           Edit
                         </button>
                         {blog.status === 'DRAFT' ? (
-                          <button type="button" onClick={async () => { await updateBlogStatus(blog.id, 'PUBLISHED'); navigateTo('/author/blogs') }} className="rounded-full bg-[#d9a441] px-4 py-2 text-sm font-semibold text-black">
-                            Publish
+                          <button type="button" disabled={updatingBlogId !== null} onClick={() => { void changeBlogStatus(blog.id, 'PUBLISHED') }} className="rounded-full bg-[#d9a441] px-4 py-2 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-50">
+                            {updatingBlogId === blog.id ? 'Updating...' : 'Publish'}
                           </button>
                         ) : (
-                          <button type="button" onClick={async () => { await updateBlogStatus(blog.id, 'DRAFT'); navigateTo('/author/blogs') }} className="rounded-full border border-[#d9a441] bg-white px-4 py-2 text-sm font-semibold text-[#1a1917]">
-                            Save draft
+                          <button type="button" disabled={updatingBlogId !== null} onClick={() => { void changeBlogStatus(blog.id, 'DRAFT') }} className="rounded-full border border-[#d9a441] bg-white px-4 py-2 text-sm font-semibold text-[#1a1917] disabled:cursor-not-allowed disabled:opacity-50">
+                            {updatingBlogId === blog.id ? 'Updating...' : 'Save draft'}
                           </button>
                         )}
                       </div>
@@ -426,6 +507,7 @@ export function AuthorBlogListPage() {
   const [blogs, setBlogs] = useState<BlogArticle[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [updatingBlogId, setUpdatingBlogId] = useState<number | null>(null)
 
   const refreshBlogs = async () => {
     try {
@@ -436,6 +518,19 @@ export function AuthorBlogListPage() {
       setError(err instanceof Error ? err.message : 'Unable to load your articles.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const changeBlogStatus = async (blogId: number, status: BlogStatus) => {
+    setUpdatingBlogId(blogId)
+    setError('')
+    try {
+      await updateBlogStatus(blogId, status)
+      await refreshBlogs()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to update the article status.')
+    } finally {
+      setUpdatingBlogId(null)
     }
   }
 
@@ -501,12 +596,12 @@ export function AuthorBlogListPage() {
                         Edit
                       </button>
                       {blog.status === 'DRAFT' ? (
-                        <button type="button" onClick={async () => { await updateBlogStatus(blog.id, 'PUBLISHED'); await refreshBlogs() }} className="rounded-full bg-[#d9a441] px-4 py-2 text-sm font-semibold text-black">
-                          Publish
+                        <button type="button" disabled={updatingBlogId === blog.id} onClick={() => { void changeBlogStatus(blog.id, 'PUBLISHED') }} className="rounded-full bg-[#d9a441] px-4 py-2 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-50">
+                          {updatingBlogId === blog.id ? 'Updating...' : 'Publish'}
                         </button>
                       ) : (
-                        <button type="button" onClick={async () => { await updateBlogStatus(blog.id, 'DRAFT'); await refreshBlogs() }} className="rounded-full border border-[#d9a441] bg-white px-4 py-2 text-sm font-semibold text-[#1a1917]">
-                          Save draft
+                        <button type="button" disabled={updatingBlogId === blog.id} onClick={() => { void changeBlogStatus(blog.id, 'DRAFT') }} className="rounded-full border border-[#d9a441] bg-white px-4 py-2 text-sm font-semibold text-[#1a1917] disabled:cursor-not-allowed disabled:opacity-50">
+                          {updatingBlogId === blog.id ? 'Updating...' : 'Save draft'}
                         </button>
                       )}
                     </div>
@@ -522,15 +617,28 @@ export function AuthorBlogListPage() {
   )
 }
 
-export function AuthorBlogEditorPage({ blogId }: { blogId?: number }) {
+type BlogEditorRole = 'ADMIN' | 'AUTHOR'
+
+function BlogEditorHeading({ blogId }: { blogId?: number }) {
+  return (
+    <div className="sticky top-28 z-30 -mx-4 mb-0 rounded-b-lg border border-[#e8dfcf] bg-white px-5 py-4 shadow-sm md:top-32">
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#a96f24]">{blogId ? 'Edit mode' : 'Create mode'}</p>
+      <h1 className="mt-1 text-3xl font-black text-black">{blogId ? 'Edit article' : 'Create article'}</h1>
+    </div>
+  )
+}
+
+export function AuthorBlogEditorPage({ blogId, role = 'AUTHOR' }: { blogId?: number; role?: BlogEditorRole }) {
   const [categories, setCategories] = useState<ApiCategory[]>([])
   const [tags, setTags] = useState<ApiTag[]>([])
   const [form, setForm] = useState<BlogFormState>(getInitialForm())
   const [loading, setLoading] = useState(true)
+  const [articleLoadFailed, setArticleLoadFailed] = useState(false)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const backPath = role === 'ADMIN' ? '/admin/dashboard' : '/author/blogs'
 
   const fetchLookups = async () => {
     const [categoryList, tagList] = await Promise.all([fetchCategories(), fetchTags()])
@@ -547,12 +655,25 @@ export function AuthorBlogEditorPage({ blogId }: { blogId?: number }) {
         if (!active) return
 
         if (blogId) {
-          const existing = await fetchBlogById(blogId)
+          let existing: BlogArticle
+          try {
+            existing = await fetchBlogById(blogId)
+          } catch (err) {
+            if (active) {
+              setError(err instanceof Error ? err.message : 'Unable to load this article.')
+              setArticleLoadFailed(true)
+            }
+            return
+          }
+          const originalContent = existing.content ?? ''
+          const originalContentText = contentToEditorText(originalContent)
           setForm({
             title: existing.title ?? '',
             slug: existing.slug ?? '',
             excerpt: existing.excerpt ?? '',
-            content: existing.content ?? '',
+            content: originalContentText,
+            originalContent,
+            originalContentText,
             featuredImageUrl: existing.featuredImageUrl ?? '',
             categoryId: existing.categoryId ?? '',
             status: (existing.status ?? 'DRAFT') as BlogStatus,
@@ -600,7 +721,9 @@ export function AuthorBlogEditorPage({ blogId }: { blogId?: number }) {
         title: form.title.trim(),
         slug: form.slug.trim() || blogSlugify(form.title),
         excerpt: form.excerpt.trim() || form.content.trim().slice(0, 180),
-        content: form.content,
+        content: form.content === form.originalContentText
+          ? form.originalContent
+          : editorTextToContent(form.content),
         featuredImageUrl: form.featuredImageUrl || undefined,
         categoryId: form.categoryId ? Number(form.categoryId) : null,
         status,
@@ -619,7 +742,7 @@ export function AuthorBlogEditorPage({ blogId }: { blogId?: number }) {
       }
 
       setSuccess(status === 'PUBLISHED' ? 'Article published successfully.' : 'Draft saved successfully.')
-      navigateTo('/author/blogs')
+      navigateTo(backPath)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to save the article.')
     } finally {
@@ -659,10 +782,11 @@ export function AuthorBlogEditorPage({ blogId }: { blogId?: number }) {
 
   if (loading) {
     return (
-      <ProtectedRoute requiredRole="AUTHOR">
+      <ProtectedRoute requiredRole={role}>
         <div className="min-h-screen bg-[#f5f2ec] text-[#1a1917]">
           <Navbar />
-          <main className="container px-4 py-24 md:py-28">
+          <main className="container px-4 pt-28 pb-24 md:pt-32 md:pb-28">
+            <BlogEditorHeading blogId={blogId} />
             <div className="rounded-3xl border border-[#e8dfcf] bg-white p-8 text-[#5c5750] shadow-sm">Loading editor…</div>
           </main>
           <Footer />
@@ -671,30 +795,39 @@ export function AuthorBlogEditorPage({ blogId }: { blogId?: number }) {
     )
   }
 
+  if (articleLoadFailed) {
+    return (
+      <ProtectedRoute requiredRole={role}>
+        <div className="min-h-screen bg-[#f5f2ec] text-[#1a1917]">
+          <Navbar />
+          <main className="container px-4 pt-28 pb-24 md:pt-32 md:pb-28">
+            <BlogEditorHeading blogId={blogId} />
+            <div className="rounded-3xl border border-[#f2c8c8] bg-[#fff6f6] p-6 text-[#8f2c2c]">
+              <h1 className="text-2xl font-bold">Unable to open this article</h1>
+              <p className="mt-2 text-sm">{error}</p>
+              <button type="button" onClick={() => navigateTo(backPath)} className="mt-5 rounded-full bg-[#d9a441] px-5 py-3 text-sm font-semibold text-black">
+                {role === 'ADMIN' ? 'Admin dashboard' : 'Back to articles'}
+              </button>
+            </div>
+          </main>
+          <Footer />
+        </div>
+      </ProtectedRoute>
+    )
+  }
+
   return (
-    <ProtectedRoute requiredRole="AUTHOR">
+      <ProtectedRoute requiredRole={role}>
       <div className="min-h-screen bg-[#f5f2ec] text-[#1a1917]">
         <Navbar />
-        <main className="container px-4 py-24 md:py-28">
-          <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#a96f24]">Author editor</p>
-              <h1 className="mt-2 text-4xl font-black tracking-[-0.05em] text-black">{blogId ? 'Edit article' : 'Create article'}</h1>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <button type="button" onClick={() => submitBlog('DRAFT')} disabled={saving} className="rounded-full border border-[#d9a441] bg-white px-5 py-3 text-sm font-semibold text-[#1a1917] disabled:cursor-not-allowed disabled:opacity-50">
-                {saving ? 'Saving...' : 'Save draft'}
-              </button>
-              <button type="button" onClick={() => submitBlog('PUBLISHED')} disabled={saving} className="rounded-full bg-[#d9a441] px-5 py-3 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-50">
-                {saving ? 'Publishing...' : 'Publish article'}
-              </button>
-            </div>
-          </div>
-
+        <main className="container px-4 pt-28 pb-24 md:pt-32 md:pb-28">
           {error && <div className="mb-6 rounded-2xl border border-[#f2c8c8] bg-[#fff6f6] p-4 text-sm text-[#8f2c2c]">{error}</div>}
           {success && <div className="mb-6 rounded-2xl border border-[#d6ecd9] bg-[#f5fff7] p-4 text-sm text-[#1f5b39]">{success}</div>}
 
           <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
+            <div className="lg:col-span-2">
+              <BlogEditorHeading blogId={blogId} />
+            </div>
             <div className="space-y-6 rounded-[28px] border border-[#e8dfcf] bg-white p-5 shadow-sm md:p-7">
               <div>
                 <label className="mb-2 block text-sm font-semibold text-[#1a1917]">Title</label>
@@ -713,7 +846,7 @@ export function AuthorBlogEditorPage({ blogId }: { blogId?: number }) {
 
               <div>
                 <label className="mb-2 block text-sm font-semibold text-[#1a1917]">Content</label>
-                <textarea value={form.content} onChange={(event) => updateField('content', event.target.value)} rows={16} className="w-full rounded-2xl border border-[#e8dfcf] bg-[#f9fbff] px-4 py-3 text-[#1a1917] outline-none focus:border-[#d9a441]" placeholder="Use your draft content here. The backend accepts JSON/Tiptap content; keep a plain text fallback for the editor if needed." />
+                <textarea value={form.content} onChange={(event) => updateField('content', event.target.value)} rows={16} className="w-full rounded-2xl border border-[#e8dfcf] bg-[#f9fbff] px-4 py-3 text-[#1a1917] outline-none focus:border-[#d9a441]" placeholder="Write your article content here." />
               </div>
             </div>
 
@@ -799,6 +932,17 @@ export function AuthorBlogEditorPage({ blogId }: { blogId?: number }) {
                 <input value={form.seoKeywords} onChange={(event) => updateField('seoKeywords', event.target.value)} className="w-full rounded-2xl border border-[#e8dfcf] bg-[#f9fbff] px-4 py-3 text-[#1a1917] outline-none focus:border-[#d9a441]" placeholder="keyword one, keyword two" />
               </div>
             </div>
+          </div>
+          <div className="mt-8 flex flex-wrap justify-end gap-3 border-t border-[#e8dfcf] py-5">
+            <button type="button" onClick={() => navigateTo(backPath)} className="rounded-full border border-[#d9a441] bg-white px-5 py-3 text-sm font-semibold text-[#1a1917]">
+              {role === 'ADMIN' ? 'Admin dashboard' : 'Back to articles'}
+            </button>
+            <button type="button" onClick={() => submitBlog(blogId ? form.status : 'DRAFT')} disabled={saving} className="rounded-full border border-[#d9a441] bg-white px-5 py-3 text-sm font-semibold text-[#1a1917] disabled:cursor-not-allowed disabled:opacity-50">
+              {saving ? 'Saving...' : blogId ? 'Save changes' : 'Save draft'}
+            </button>
+            <button type="button" onClick={() => submitBlog('PUBLISHED')} disabled={saving} className="rounded-full bg-[#d9a441] px-5 py-3 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-50">
+              {saving ? 'Publishing...' : role === 'ADMIN' ? 'Publish now' : 'Publish article'}
+            </button>
           </div>
         </main>
         <Footer />

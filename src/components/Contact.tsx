@@ -17,7 +17,7 @@ const defaultForm = {
   name: "",
   businessName: "",
   phone: "",
-  service: "SEO",
+  service: "SEO & AI Search Optimization",
   message: "",
 };
 
@@ -36,7 +36,7 @@ export default function Contact() {
 
     const timer = window.setTimeout(() => {
       setStatusMessage(null);
-    }, 2000);
+    }, 6000);
 
     return () => window.clearTimeout(timer);
   }, [statusMessage]);
@@ -208,12 +208,13 @@ export default function Contact() {
                 onChange={handleChange}
                 className="w-full rounded-lg border border-[#dfe9ff] bg-[#f9fbff] p-3 text-[#071033] outline-none focus:border-[#0b63ff]"
               >
-                <option>SEO</option>
+                <option>SEO & AI Search Optimization</option>
                 <option>Website Development</option>
-                <option>Google Business Profile</option>
+                <option>Website Updation or Maintenance</option>
+                <option>Google Business Profile Management</option>
+                <option>Social Media Management</option>
+                <option>Graphic Design & Branding</option>
                 <option>Content Writing</option>
-                <option>Graphics Design</option>
-                <option>Social Media & Ads Management</option>
                 <option>Multiple Services</option>
               </select>
             </div>

@@ -1,3 +1,4 @@
+import Contact from '../components/Contact'
 import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
 import WhatsAppButton from '../components/WhatsAppButton'
@@ -92,6 +93,7 @@ export default function ServiceLandingPage({
         </div>
       </main>
 
+      <Contact />
       <Footer />
       <WhatsAppButton />
     </div>
