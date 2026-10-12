@@ -38,6 +38,25 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+html, body, #root {
+  min-height: 100%;
+  height: 100%;
+}
+
+#root {
+  width: 100%;
+}
+
+#root > * {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+footer {
+  margin-top: auto;
+}
+
 button, a, input, select, textarea {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;

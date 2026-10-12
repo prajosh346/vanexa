@@ -16,6 +16,16 @@ import WhatsAppButton from './components/WhatsAppButton'
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
 import ServiceLandingPage, { type ServicePageMeta } from './pages/ServiceLandingPage'
 import TermsPage from './pages/TermsPage'
+import BlogListPage from './pages/BlogListPage'
+import BlogDetailPage from './pages/BlogDetailPage'
+import { AboutPage, ContactPage, DisclaimerPage, PortfolioPage, ServicesPage } from './pages/InfoPages'
+import {
+  AdminDashboardPage,
+  AdminLoginPage,
+  AuthorBlogEditorPage,
+  AuthorBlogListPage,
+  AuthorDashboardPage,
+} from './pages/AdminPages'
 
 const servicePageMeta: Record<string, ServicePageMeta> = {
   '/services/seo-ai-search-optimization': {
@@ -83,29 +93,29 @@ const servicePageMeta: Record<string, ServicePageMeta> = {
       { q: 'Can design support my marketing efforts?', a: 'Yes. Strong visuals improve brand recall, ad performance, and customer trust across websites, social channels and advertising.' },
     ],
   },
-};
+}
 
 function updatePageMeta(title: string, description: string, keywords?: string) {
-  document.title = title;
+  document.title = title
 
-  const metaDescription = document.querySelector('meta[name="description"]') ?? document.createElement('meta');
-  metaDescription.setAttribute('name', 'description');
-  metaDescription.setAttribute('content', description);
+  const metaDescription = document.querySelector('meta[name="description"]') ?? document.createElement('meta')
+  metaDescription.setAttribute('name', 'description')
+  metaDescription.setAttribute('content', description)
   if (!metaDescription.parentNode) {
-    document.head.appendChild(metaDescription);
+    document.head.appendChild(metaDescription)
   }
 
   if (keywords) {
-    const metaKeywords = document.querySelector('meta[name="keywords"]') ?? document.createElement('meta');
-    metaKeywords.setAttribute('name', 'keywords');
-    metaKeywords.setAttribute('content', keywords);
+    const metaKeywords = document.querySelector('meta[name="keywords"]') ?? document.createElement('meta')
+    metaKeywords.setAttribute('name', 'keywords')
+    metaKeywords.setAttribute('content', keywords)
     if (!metaKeywords.parentNode) {
-      document.head.appendChild(metaKeywords);
+      document.head.appendChild(metaKeywords)
     }
   }
 }
 
-function HomePage(){
+function HomePage() {
   return (
     <div className="min-h-screen bg-[#f5f2ec] text-[#1a1917]">
       <Navbar />
@@ -128,7 +138,7 @@ function HomePage(){
   )
 }
 
-function App(){
+function App() {
   const [path, setPath] = useState(() => window.location.pathname)
 
   useEffect(() => {
@@ -139,34 +149,88 @@ function App(){
 
   useEffect(() => {
     if (path === '/privacy-policy') {
-      updatePageMeta('Privacy Policy | Vanexa Studio', 'Read the privacy policy for Vanexa Studio and understand how we handle project inquiries, contact data and digital service information.');
-      return;
+      updatePageMeta('Privacy Policy | Vanexa Studio', 'Read the privacy policy for Vanexa Studio and understand how we handle project inquiries, contact data and digital service information.')
+      return
     }
 
     if (path === '/terms-and-conditions') {
-      updatePageMeta('Terms & Conditions | Vanexa Studio', 'Read the service terms and conditions for Vanexa Studio website, design, SEO and digital growth engagements.');
-      return;
+      updatePageMeta('Terms & Conditions | Vanexa Studio', 'Read the service terms and conditions for Vanexa Studio website, design, SEO and digital growth engagements.')
+      return
+    }
+
+    if (path === '/about') {
+      updatePageMeta('About Vanexa Studio', 'Learn about Vanexa Studio and the strategy-first digital growth approach we use for website, SEO, marketing and local business support.')
+      return
+    }
+
+    if (path === '/services') {
+      updatePageMeta('Services | Vanexa Studio', 'Explore Vanexa Studio web development, SEO, social media, Google Business Profile and digital growth services for modern businesses.')
+      return
+    }
+
+    if (path === '/portfolio') {
+      updatePageMeta('Portfolio | Vanexa Studio', 'See examples of digital growth work and service capabilities at Vanexa Studio.')
+      return
+    }
+
+    if (path === '/contact') {
+      updatePageMeta('Contact Vanexa Studio', 'Discuss your website, SEO, or digital marketing project with Vanexa Studio in Pune.')
+      return
+    }
+
+    if (path === '/blog') {
+      updatePageMeta('Blog | Vanexa Studio', 'Read practical insights on SEO, website growth, digital marketing and local business visibility from Vanexa Studio.')
+      return
     }
 
     if (path.startsWith('/services/')) {
-      const routeMeta = servicePageMeta[path];
+      const routeMeta = servicePageMeta[path]
       if (routeMeta) {
-        updatePageMeta(routeMeta.title, routeMeta.description, routeMeta.keywords);
-        return;
+        updatePageMeta(routeMeta.title, routeMeta.description, routeMeta.keywords)
+        return
       }
+    }
+
+    if (path.startsWith('/blog/')) {
+      updatePageMeta('Vanexa Studio Blog', 'Read recent digital marketing and growth insights from Vanexa Studio.')
+      return
+    }
+
+    if (path === '/disclaimer') {
+      updatePageMeta('Disclaimer | Vanexa Studio', 'Read the Vanexa Studio disclaimer and important business information.')
+      return
     }
 
     updatePageMeta(
       'Vanexa Studio | Digital Marketing, SEO & Web Development Pune',
-      'Vanexa Studio helps businesses grow online with website development and updates, SEO and AI search optimization, Google Business Profile management, social media marketing and graphic design.'
-    );
+      'Vanexa Studio helps businesses grow online with website development and updates, SEO and AI search optimization, Google Business Profile management, social media marketing and graphic design.',
+    )
   }, [path])
 
   if (path === '/privacy-policy') return <PrivacyPolicyPage />
   if (path === '/terms-and-conditions') return <TermsPage />
+  if (path === '/about') return <AboutPage />
+  if (path === '/services') return <ServicesPage />
+  if (path === '/portfolio') return <PortfolioPage />
+  if (path === '/contact') return <ContactPage />
+  if (path === '/disclaimer') return <DisclaimerPage />
+  if (path === '/blog') return <BlogListPage />
+  if (path.startsWith('/blog/')) {
+    const slug = path.replace('/blog/', '')
+    if (slug) return <BlogDetailPage slug={slug} />
+  }
+  if (path === '/admin/login') return <AdminLoginPage />
+  if (path === '/admin/dashboard') return <AdminDashboardPage />
+  if (path === '/author/dashboard') return <AuthorDashboardPage />
+  if (path === '/author/blogs') return <AuthorBlogListPage />
+  if (path === '/author/blogs/new') return <AuthorBlogEditorPage />
+  if (/^\/author\/blogs\/\d+\/edit$/.test(path)) {
+    const blogId = Number(path.split('/')[3])
+    return <AuthorBlogEditorPage blogId={blogId} />
+  }
   if (path.startsWith('/services/')) {
-    const routeMeta = servicePageMeta[path];
-    if (routeMeta) return <ServiceLandingPage {...routeMeta} />;
+    const routeMeta = servicePageMeta[path]
+    if (routeMeta) return <ServiceLandingPage {...routeMeta} />
   }
 
   return <HomePage />

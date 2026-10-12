@@ -1,5 +1,6 @@
 import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
+import WhatsAppButton from '../components/WhatsAppButton'
 
 export type ServicePageMeta = {
   slug: string
@@ -92,6 +93,7 @@ export default function ServiceLandingPage({
       </main>
 
       <Footer />
+      <WhatsAppButton />
     </div>
   )
 }

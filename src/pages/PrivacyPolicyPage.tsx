@@ -1,5 +1,6 @@
-import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
+import Navbar from '../components/Navbar'
+import WhatsAppButton from '../components/WhatsAppButton'
 
 export default function PrivacyPolicyPage() {
   return (
@@ -56,6 +57,7 @@ export default function PrivacyPolicyPage() {
         </div>
       </section>
       <Footer />
+      <WhatsAppButton />
     </div>
   )
 }
