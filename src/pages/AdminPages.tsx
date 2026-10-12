@@ -8,7 +8,6 @@ import {
   fetchBlogById,
   fetchBlogsAdmin,
   fetchCategories,
-  fetchPublicBlogs,
   fetchTags,
   getStoredSession,
   loginUser,
@@ -218,7 +217,7 @@ export function AdminDashboardPage() {
 
     const loadOverview = async () => {
       try {
-        const result = await fetchPublicBlogs({ page: 0, size: 50 })
+        const result = await fetchBlogsAdmin({ page: 0, size: 50 })
         if (!active) return
         setBlogs(result.content || [])
       } catch (err) {
@@ -269,7 +268,7 @@ export function AdminDashboardPage() {
             <>
               <div className="grid gap-4 md:grid-cols-4">
                 {[
-                  ['Total posts', String(blogs.length), 'Published blog inventory from the public endpoint'],
+                  ['Total posts', String(blogs.length), 'Protected blog inventory from the authenticated admin feed'],
                   ['Published', String(publishedCount), 'Currently visible public articles'],
                   ['Draft', String(draftCount), 'Drafts available in raw backend data when exposed'],
                   ['Archived', String(archivedCount), 'Archived content from available backend states'],
