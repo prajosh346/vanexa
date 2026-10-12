@@ -5,7 +5,7 @@ export default function About(){
       <div className="container grid items-start gap-8 md:grid-cols-3">
         <div className="md:col-span-2">
           <h2 className="text-2xl font-semibold text-[#071033]">We Don't Just Build Digital Presence. We Build Digital Growth.</h2>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-[#384868]">VANEXA is a website development company in Pune and a digital growth partner for businesses that want stronger Google visibility, better local SEO, modern brand presence and results-driven marketing. We help businesses build a website, improve online discovery and grow with a clear digital strategy.</p>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-[#384868]">VANEXA is a website development company in Pune and a digital growth partner for businesses that want stronger Google visibility, better SEO services in Pune, modern website development services, Google Business Profile management services, social media marketing agency support and professional graphic design services in Pune. We help businesses improve online discovery, build trust and grow with a clear digital strategy.</p>
         </div>
         <div className="grid gap-4">
           <div className="rounded-xl border border-[#dfe9ff] bg-white p-4 shadow-sm">

@@ -21,7 +21,11 @@ const faqs = [
   },
   {
     q: 'Do you provide Google Business Profile services?',
-    a: 'Yes. We help businesses with Google Business Profile creation, optimization, business information, categories, local SEO, content, and overall local visibility.'
+    a: 'Yes. We help businesses with Google Business Profile creation, Google Business Profile management, optimization, local SEO, business information updates, category improvements and overall local visibility.'
+  },
+  {
+    q: 'Can you optimize my website for AI search and local discovery?',
+    a: 'Yes. We support AI search optimization, answer-engine-friendly content, local search visibility, technical SEO, and structured website improvements that help your business become easier to discover online.'
   },
   {
     q: 'Can you manage both my website and SEO?',

@@ -35,8 +35,8 @@ export default function Hero(){
             transition={{ delay: 0.3 }}
             className="mt-8 max-w-2xl text-lg leading-relaxed text-[#5c5750] md:text-xl"
           >
-            VANEXA is a digital marketing agency in Pune helping small businesses with
-            <span className="text-black"> website development services, local SEO, Google Business Profile management, AI search optimization and growth-focused digital marketing</span> that turn searches into real customers.
+            VANEXA is a digital marketing agency in Pune and a website development company in Pune helping small businesses with
+            <span className="text-black"> website development services, SEO services in Pune, Google Business Profile management, AI search optimization, social media marketing and growth-focused digital marketing</span> that turn searches into real customers.
           </motion.p>
 
           <motion.div

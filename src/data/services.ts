@@ -2,42 +2,42 @@ export const services = [
   {
     id: 'seo',
     title: 'SEO',
-    description: 'Improve search visibility, increase local SEO performance and strengthen your presence in Google and AI-driven discovery.',
+    description: 'Improve search visibility with local SEO services in Pune, technical SEO, website SEO audit support and AI search optimization for better discovery.',
     icon: 'Search',
     cta: 'Explore SEO'
   },
   {
     id: 'web',
     title: 'Website Development',
-    description: 'Fast, responsive business websites and website updation services designed to convert visitors into customers.',
+    description: 'Professional website development services, responsive web design, website redesign and website maintenance company support for growing businesses.',
     icon: 'Code',
     cta: 'Build Your Website'
   },
   {
     id: 'social-ads',
     title: 'Social Media & Ads Management',
-    description: 'Reach the right audience with social media management, creatives and campaigns tailored for local growth.',
+    description: 'Social media management in Pune, Instagram marketing services, content creation and promotional creatives for small businesses and local brands.',
     icon: 'Megaphone',
     cta: 'Grow Your Reach'
   },
   {
     id: 'gbp',
     title: 'Google Business Profile',
-    description: 'Optimize your local business listing, improve map visibility and help nearby customers choose your business.',
+    description: 'Google Business Profile optimization in Pune, local business listing optimization, Google Maps SEO and local search visibility support for your business.',
     icon: 'MapPin',
     cta: 'Improve Local Visibility'
   },
   {
     id: 'content',
     title: 'Content Writing',
-    description: 'SEO content writing and website copy designed to support search rankings, trust and better customer engagement.',
+    description: 'Website content writing services, SEO content writing and business content creation designed to improve trust, engagement and search value.',
     icon: 'Pen',
     cta: 'Create Better Content'
   },
   {
     id: 'design',
     title: 'Graphics Design',
-    description: 'Build a recognizable brand with promotional design, branding assets and digital creatives that support growth.',
+    description: 'Graphic design services in Pune, branding support, logo design and promotional creatives for digital growth and stronger brand recognition.',
     icon: 'Palette',
     cta: 'Design Your Brand'
   }
