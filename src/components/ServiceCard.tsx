@@ -1,5 +1,7 @@
 import type { LucideIcon } from 'lucide-react'
 
+import { buildWhatsAppUrl, getWhatsAppTemplate } from '../data/whatsapp'
+
 type Props = {
   title: string
   description: string
@@ -8,6 +10,8 @@ type Props = {
 }
 
 export default function ServiceCard({title,description,cta,Icon}:Props){
+  const whatsappUrl = buildWhatsAppUrl(getWhatsAppTemplate(title))
+
   return (
     <div className="rounded-2xl border border-[#dfe9ff] bg-white p-6 shadow-[0_16px_40px_rgba(7,16,51,0.06)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_18px_45px_rgba(11,99,255,0.12)]">
       <div className="flex items-center gap-4">
@@ -15,8 +19,8 @@ export default function ServiceCard({title,description,cta,Icon}:Props){
         <h3 className="text-lg font-semibold text-[#071033]">{title}</h3>
       </div>
       <p className="mt-4 text-sm leading-6 text-[#384868]">{description}</p>
-      <div className="mt-6">
-        <a href="#services" className="font-medium text-[#0b63ff] transition hover:text-[#071033]">{cta} →</a>
+      <div className="mt-6 flex items-center gap-4">
+        <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-[#0b63ff] transition hover:text-[#071033]">{cta} →</a>
       </div>
     </div>
   )

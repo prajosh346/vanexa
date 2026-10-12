@@ -2,42 +2,42 @@ export const services = [
   {
     id: 'seo',
     title: 'SEO',
-    description: 'Improve your search visibility, attract qualified visitors and build sustainable organic growth.',
+    description: 'Improve search visibility, increase local SEO performance and strengthen your presence in Google and AI-driven discovery.',
     icon: 'Search',
     cta: 'Explore SEO'
   },
   {
     id: 'web',
     title: 'Website Development',
-    description: 'Fast, responsive and SEO-friendly websites designed to turn visitors into customers.',
+    description: 'Fast, responsive business websites and website updation services designed to convert visitors into customers.',
     icon: 'Code',
     cta: 'Build Your Website'
   },
   {
     id: 'social-ads',
     title: 'Social Media & Ads Management',
-    description: 'Reach the right audience with performance-driven campaigns, creative content, and consistent brand visibility.',
+    description: 'Reach the right audience with social media management, creatives and campaigns tailored for local growth.',
     icon: 'Megaphone',
     cta: 'Grow Your Reach'
   },
   {
     id: 'gbp',
     title: 'Google Business Profile',
-    description: 'Strengthen your local presence and help nearby customers discover your business.',
+    description: 'Optimize your local business listing, improve map visibility and help nearby customers choose your business.',
     icon: 'MapPin',
     cta: 'Improve Local Visibility'
   },
   {
     id: 'content',
     title: 'Content Writing',
-    description: 'Strategic, engaging and SEO-focused content designed for both search engines and people.',
+    description: 'SEO content writing and website copy designed to support search rankings, trust and better customer engagement.',
     icon: 'Pen',
     cta: 'Create Better Content'
   },
   {
     id: 'design',
     title: 'Graphics Design',
-    description: 'Build a recognizable brand with professional visuals designed for digital platforms.',
+    description: 'Build a recognizable brand with promotional design, branding assets and digital creatives that support growth.',
     icon: 'Palette',
     cta: 'Design Your Brand'
   }

@@ -1,6 +1,7 @@
 import emailjs from "@emailjs/browser";
 import { type ChangeEvent, useEffect, useState } from "react";
 
+import { buildWhatsAppUrl, getWhatsAppTemplate } from "../data/whatsapp";
 import SocialMediaIcons from "./SocialMediaIcons";
 
 const EMAILJS_SERVICE_ID =
@@ -223,7 +224,7 @@ export default function Contact() {
           )}
 
           {/* Submit */}
-          <div>
+          <div className="flex flex-col gap-3 sm:flex-row">
             <button
               type="submit"
               disabled={!isFormValid || isSubmitting}
@@ -231,6 +232,15 @@ export default function Contact() {
             >
               {isSubmitting ? "Sending..." : "Send Enquiry"}
             </button>
+
+            <a
+              href={buildWhatsAppUrl(getWhatsAppTemplate(formData.service))}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center rounded-md border border-[#25D366] bg-[#25D366] px-6 py-3 font-semibold text-white shadow-[0_10px_24px_rgba(37,211,102,0.25)] transition hover:translate-y-[-1px] hover:bg-[#20bf5b]"
+            >
+              WhatsApp Us
+            </a>
           </div>
         </form>
       </div>

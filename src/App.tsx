@@ -6,10 +6,13 @@ import About from './components/About'
 import Process from './components/Process'
 import Results from './components/Results'
 import WhyVanexa from './components/WhyVanexa'
+import LocalBusinessGrowth from './components/LocalBusinessGrowth'
+import ProjectEstimator from './components/ProjectEstimator'
 import FAQ from './components/FAQ'
 import CTA from './components/CTA'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
+import WhatsAppButton from './components/WhatsAppButton'
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
 import TermsPage from './pages/TermsPage'
 
@@ -21,14 +24,17 @@ function HomePage(){
         <Hero />
         <Services />
         <About />
+        <LocalBusinessGrowth />
         <Process />
         <Results />
         <WhyVanexa />
+        <ProjectEstimator />
         <FAQ />
         <CTA />
         <Contact />
       </main>
       <Footer />
+      <WhatsAppButton />
     </div>
   )
 }
